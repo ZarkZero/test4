@@ -1,0 +1,64 @@
+name: Download-anything
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+
+env:
+ TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Initialization environment
+      id: init
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo timedatectl set-timezone "$TZ"
+
+    - name: config push
+      env:
+        PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+      if: ${{ env.PUSH_TOKEN != '' }}
+      run: |
+        echo "PUSH_TOKEN=${{ secrets.PUSH_TOKEN }}" >> $GITHUB_ENV
+        git config --global user.email "782558181@qq.com"
+        git config --global user.name "ZarkZero"
+
+    - name: Clone source code
+      run: |
+       curl https://storage.googleapis.com/git-repo-downloads/repo -o repo
+       chmod +x repo
+       ./repo init -u git://source.codeaurora.org/quic/cc-qrdk/releases/manifest/qstak -b release -m caf_AU_LINUX_QSDK_NHSS.QSDK.11.5_TARGET_ALL.11.5.0.7762.7876.xml
+       ls
+       ./repo sync
+       ls
+
+    - name: Push Files
+      run: |
+       git add .
+       git commit -m 'test file'
+       git push
+
+
+
+#Alternatively
+#caf_AU_LINUX_QSDK_NHSS.QSDK.11.4_TARGET_ALL.12.0.6938.000.6969.xml
+#caf_AU_LINUX_QSDK_NHSS.QSDK.11.3_TARGET_ALL.12.0.5871.00.6204.xml
+#caf_AU_LINUX_QSDK_NHSS.QSDK.11.2_TARGET_ALL.12.0.4959.5165.xml
+#caf_AU_LINUX_QSDK_NHSS.QSDK.11.1_TARGET_ALL.12.0.4170.001.5167.xml
+#caf_AU_LINUX_QSDK_NHSS.QSDK.11.1.R1_TARGET_ALL.12.0.4093.004.xml
+#caf_AU_LINUX_QSDK_NHSS.QSDK.11.0_TARGET_ALL.11.0.3821.4517.xml
+#caf_AU_LINUX_QSDK_NHSS.QSDK.11.5.0.5.R7_TARGET_ALL.12.0.000.934.009.xml
+#caf_AU_LINUX_QSDK_NHSS.QSDK.12.1.R2_TARGET_ALL.12.1.02.841.013.xml
