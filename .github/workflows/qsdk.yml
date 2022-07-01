@@ -47,9 +47,8 @@ jobs:
 
     - name: Push Files
       run: |
-       git add .
-       git commit -m 'test file'
-       git push
+       git commit -m -q 'first commit' -a
+       git push -q
 
 
 
